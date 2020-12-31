@@ -1,6 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const { VueLoaderPlugin } = require("vue-loader");
+const path = require("path");
 
 module.exports = {
   output: {
@@ -8,11 +9,18 @@ module.exports = {
   },
 
   resolve: {
-    extensions: [".vue", ".jsx", ".js", ".json"],
+    extensions: [".tsx", ".ts", ".vue", ".jsx", ".js", ".json"],
   },
 
   devServer: {
+    contentBase: path.join(__dirname, "public"),
     port: 8080,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers":
+        "X-Requested-With, content-type, Authorization",
+    },
   },
 
   module: {
@@ -22,15 +30,16 @@ module.exports = {
         loader: "vue-loader",
       },
       {
-        test: /\.s[ac]ss$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        },
+        exclude: /node_modules/,
       },
       {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-        },
+        test: /\.s[ac]ss$/i,
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ],
   },
